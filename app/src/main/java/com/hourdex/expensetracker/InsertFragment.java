@@ -1,93 +1,134 @@
 package com.hourdex.expensetracker;
 
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.textfield.TextInputEditText;
 import com.hourdex.expensetracker.database.tables.TransactionTable;
 
-import java.util.Objects;
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link InsertFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class InsertFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private TextInputEditText amountInput, titleInput, descriptionInput;
+    private MaterialSwitch typeSwitch;
+    private TextView typeText;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String selectedCategory = null;
 
-    public InsertFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment InsertFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static InsertFragment newInstance(String param1, String param2) {
-        InsertFragment fragment = new InsertFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
+    public InsertFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_insert, container, false);
 
-        final TextView amountView = view.findViewById(R.id.amount);
-        final Button buttonView = view.findViewById(R.id.save_btn);
+        amountInput = view.findViewById(R.id.amount);
+        titleInput = view.findViewById(R.id.title_input);
+        descriptionInput = view.findViewById(R.id.description_input);
 
-        buttonView.setOnClickListener( v -> {
-            MainActivity mainActivity = (MainActivity) getActivity();
+        typeText = view.findViewById(R.id.transaction_type);
+        typeSwitch = view.findViewById(R.id.type_switch);
 
-            new Thread(()->{
+        Button saveBtn = view.findViewById(R.id.save_btn);
 
-                mainActivity.getTransactionDao().newTransaction(
-                        new TransactionTable(
-                                "test",
-                                Double.parseDouble(amountView.getText().toString()),
-                                1,
-                                "test"
-                        )
-                );
-            }).start();
-        });
+        Button food = view.findViewById(R.id.btn_food);
+        Button work = view.findViewById(R.id.btn_work);
+        Button study = view.findViewById(R.id.btn_study);
+        Button house = view.findViewById(R.id.btn_house);
+        Button transport = view.findViewById(R.id.btn_transport);
 
+        typeSwitch.setOnCheckedChangeListener((b, checked) ->
+                typeText.setText(checked ? "Income" : "Outcome")
+        );
 
-        return  view;
+        View.OnClickListener categoryClick = v -> {
+            selectedCategory = ((Button) v).getText().toString();
+            Toast.makeText(getContext(),
+                    "Selected: " + selectedCategory,
+                    Toast.LENGTH_SHORT).show();
+        };
+
+        food.setOnClickListener(categoryClick);
+        work.setOnClickListener(categoryClick);
+        study.setOnClickListener(categoryClick);
+        house.setOnClickListener(categoryClick);
+        transport.setOnClickListener(categoryClick);
+
+        saveBtn.setOnClickListener(v -> saveTransaction());
+
+        return view;
+    }
+
+    private void saveTransaction() {
+
+        if (titleInput.getText() == null ||
+        titleInput.getText().toString().trim().isEmpty()) {
+            Toast.makeText(getContext(), "Enter title", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (amountInput.getText() == null ||
+        amountInput.getText().toString().trim().isEmpty()) {
+            Toast.makeText(getContext(), "Enter amount", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (selectedCategory == null) {
+            Toast.makeText(getContext(), "Select category", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double amount;
+        try {
+            amount = Double.parseDouble(amountInput.getText().toString());
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "Invalid amount", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String title = titleInput.getText().toString().trim();
+        String description = descriptionInput.getText() != null
+                ? descriptionInput.getText().toString().trim()
+                : "";
+
+        int categoryId = getCategoryId(selectedCategory);
+
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity == null) return;
+
+        new Thread(() -> {
+            mainActivity.getTransactionDao().newTransaction(
+                    new TransactionTable(
+                            title,
+                            amount,
+                            categoryId,
+                            description
+                    )
+            );
+            requireActivity().runOnUiThread(() ->
+                    Toast.makeText(getContext(),
+                            "Transaction saved",
+                            Toast.LENGTH_SHORT).show()
+            );
+        }).start();
+    }
+
+    private int getCategoryId(String category) {
+        switch (category) {
+            case "Food": return 1;
+            case "Work": return 2;
+            case "Study": return 3;
+            case "House": return 4;
+            case "Transport": return 5;
+            default: return 0;
+        }
     }
 }

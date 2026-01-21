@@ -82,7 +82,7 @@ public class ListFragment extends Fragment {
         assert mainActivity != null;
         mainActivity.getTransactionDao().getAll().observe(getViewLifecycleOwner(), transactionTables -> {
             transactionTables.forEach(t->{
-                Log.d("testDB", "onCreateView: " + t.amount);
+                Log.d("testDB", "onCreateView: " +", id:"+ t.id +", label:"+ t.label + ", amount:"+ t.amount +", category_id:"+ t.category_id +", description:"+ t.description);
             });
         });
     }
