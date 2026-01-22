@@ -10,37 +10,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+
 public class ListFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private int percentTage;
     private String mParam2;
+    private TransactionAdapter adapter;
+    private ListView listView;
 
     public ListFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param pTag Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ListFragment newInstance(int pTag, String param2) {
         ListFragment fragment = new ListFragment();
         Bundle args = new Bundle();
@@ -57,46 +45,40 @@ public class ListFragment extends Fragment {
             percentTage = Integer.parseInt(getArguments().getString(ARG_PARAM1));
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        fetchAll();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-         View view = inflater.inflate(R.layout.fragment_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_list, container, false);
+
         ProgressBar progressBar = view.findViewById(R.id.progressBar);
         progressBar.setProgress(percentTage);
-        fetchAll();
-        return view;
 
+        listView = view.findViewById(R.id.transaction_list);
+        adapter = new TransactionAdapter(getContext(), new ArrayList<>());
+        listView.setAdapter(adapter);
+
+        return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        fetchAll();
 
         MainActivity mainActivity = (MainActivity) getActivity();
 
-        assert mainActivity != null;
-        mainActivity.getTransactionDao().getAll().observe(getViewLifecycleOwner(), transactionTables -> {
-            transactionTables.forEach(t->{
-                Log.d("testDB", "onCreateView: " +", id:"+ t.id +", label:"+ t.label + ", amount:"+ t.amount +", category_id:"+ t.category_id +", description:"+ t.description);
+        if (mainActivity != null) {
+            mainActivity.getTransactionDao().getAll().observe(getViewLifecycleOwner(), transactionTables -> {
+                adapter.clear();
+                adapter.addAll(transactionTables);
+                adapter.notifyDataSetChanged();
+
+                transactionTables.forEach(t -> {
+                    Log.d("testDB", "Transaction: id:" + t.id + ", label:" + t.label +
+                            ", amount:" + t.amount + ", category_id:" + t.category_id);
+                });
             });
-        });
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        fetchAll();
-    }
-
-    private void fetchAll() {
-        new Thread(()->{
-            MainActivity mainActivity = (MainActivity) getActivity();
-            Log.d("testDB", "onCreateView: " + mainActivity.getTransactionDao().getAll());
-        });
+        }
     }
 }
