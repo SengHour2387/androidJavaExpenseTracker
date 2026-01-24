@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -57,6 +58,13 @@ public class ListFragment extends Fragment {
 
         listView = view.findViewById(R.id.transaction_list);
         adapter = new TransactionAdapter(getContext(), new ArrayList<>());
+
+        LinearLayout budgetContainer = view.findViewById(R.id.budget_container);
+        budgetContainer.setOnClickListener(containerView->{
+
+        });
+
+
         listView.setAdapter(adapter);
 
         return view;
