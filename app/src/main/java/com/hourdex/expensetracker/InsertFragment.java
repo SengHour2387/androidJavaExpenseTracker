@@ -12,7 +12,10 @@ import android.widget.Toast;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
+import com.hourdex.expensetracker.controllers.TransactionController;
 import com.hourdex.expensetracker.database.tables.TransactionTable;
+
+import java.util.Date;
 
 public class InsertFragment extends Fragment {
 
@@ -105,19 +108,32 @@ public class InsertFragment extends Fragment {
         if (mainActivity == null) return;
 
         new Thread(() -> {
-            mainActivity.getTransactionDao().newTransaction(
+
+
+            TransactionController controller = new TransactionController(mainActivity);
+
+            boolean isSaved = controller.createTransaction(
                     new TransactionTable(
                             title,
-                            amount,
+                            typeSwitch.isChecked() ? amount : -amount,
                             categoryId,
-                            description
+                            description,
+                            new Date()
                     )
             );
-            requireActivity().runOnUiThread(() ->
-                    Toast.makeText(getContext(),
-                            "Transaction saved",
-                            Toast.LENGTH_SHORT).show()
-            );
+            if(isSaved) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getContext(),
+                                "Transaction saved",
+                                Toast.LENGTH_SHORT).show()
+                );
+            } else  {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getContext(),
+                                "Transaction could not be saved",
+                                Toast.LENGTH_SHORT).show()
+                );
+            }
         }).start();
     }
 

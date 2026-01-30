@@ -12,31 +12,36 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.room.Room;
-import androidx.viewbinding.ViewBindings;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hourdex.expensetracker.database.ExpenseRoom;
+import com.hourdex.expensetracker.database.daos.BudgetDao;
 import com.hourdex.expensetracker.database.daos.TransactionDao;
 import com.hourdex.expensetracker.databinding.ActivityMainBinding;
-import com.hourdex.expensetracker.repos.transactionRepo;
 
 public class MainActivity extends AppCompatActivity {
 
     private ExpenseRoom room;
     private TransactionDao transactionDao;
+    private BudgetDao budgetDao;
 
 
     public TransactionDao getTransactionDao() {
         return transactionDao;
     }
+    public BudgetDao getBudgetDao() {
+        return budgetDao;
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        room = Room.databaseBuilder(getApplicationContext(), ExpenseRoom.class, "expense_db").build();
+        room = Room.databaseBuilder(getApplicationContext(), ExpenseRoom.class, "expense_db")
+                .build();
 
-        final transactionRepo repo = new transactionRepo(room);
         transactionDao = room.transactionDao();
+        budgetDao = room.budgetDao();
 
         super.onCreate(savedInstanceState);
 
@@ -54,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         if(savedInstanceState == null) {
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction();
             fragmentTransaction.replace(R.id.fragmentContainerView, ListFragment.newInstance(35, null));
             fragmentTransaction.commit();
         }
@@ -71,13 +77,17 @@ public class MainActivity extends AppCompatActivity {
         } );
 
         addFab.setOnClickListener( view -> {
-
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
+            FragmentTransaction fragmentTransaction = fragmentManager
+                    .beginTransaction()
+                    .setCustomAnimations(
+                            R.anim.slide_in_right,    // enter
+                            R.anim.slide_out_right,    // exit
+                            R.anim.slide_in_right,     // popEnter
+                            R.anim.slide_out_right     // popBack
+                    );
             fragmentTransaction.replace(R.id.fragmentContainerView, new InsertFragment());
             fragmentTransaction.addToBackStack("add_fragment");
             fragmentTransaction.commit();
-
         });
     }
 }

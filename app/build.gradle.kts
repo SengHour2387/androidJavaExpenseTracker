@@ -1,3 +1,7 @@
+import java.net.URI
+import java.net.URL
+import java.util.regex.Pattern.compile
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -33,9 +37,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
-
 dependencies {
 
+    // chart library
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    implementation(libs.coordinatorlayout)
     val room_version = "2.8.4"
 
     implementation("androidx.room:room-runtime:$room_version")

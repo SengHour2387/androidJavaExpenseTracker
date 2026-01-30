@@ -37,7 +37,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="38sp"
-            android:inputType="number" />
+            android:text="0"
+            android:inputType="numberDecimal"/>
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/title_input"
@@ -57,6 +58,7 @@
             android:layout_marginBottom="8dp" />
 
         <LinearLayout
+            android:layout_margin="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

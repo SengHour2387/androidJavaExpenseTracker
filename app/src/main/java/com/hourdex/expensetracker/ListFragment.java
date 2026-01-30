@@ -1,5 +1,6 @@
 package com.hourdex.expensetracker;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -61,12 +62,13 @@ public class ListFragment extends Fragment {
 
         LinearLayout budgetContainer = view.findViewById(R.id.budget_container);
         budgetContainer.setOnClickListener(containerView->{
-
+            final Intent intent = new Intent();
+            intent.setClass(getContext(), BudgetActivity.class);
+            startActivity(intent);
         });
 
 
         listView.setAdapter(adapter);
-
         return view;
     }
 

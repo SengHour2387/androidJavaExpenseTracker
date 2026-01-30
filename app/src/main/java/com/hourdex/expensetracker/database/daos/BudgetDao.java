@@ -2,6 +2,7 @@ package com.hourdex.expensetracker.database.daos;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.hourdex.expensetracker.database.tables.BudgetTable;
@@ -17,6 +18,7 @@ public interface BudgetDao {
     //query for getting last record of budget
     @Query("SELECT * FROM budget_tbl ORDER BY id DESC LIMIT 1")
     BudgetTable getLastBudget();
-    @Insert
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void newRecord(BudgetTable budgetTable);
 }

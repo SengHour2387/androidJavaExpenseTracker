@@ -13,7 +13,6 @@ import androidx.annotation.Nullable;
 import com.hourdex.expensetracker.database.tables.TransactionTable;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -39,12 +38,17 @@ public class TransactionAdapter extends ArrayAdapter<TransactionTable> {
             TextView dateView = convertView.findViewById(R.id.transaction_date);
 
             titleView.setText(transaction.label);
-            amountView.setText(String.format(Locale.getDefault(), "%.1f$", transaction.amount));
-            categoryView.setText(getCategoryName(transaction.category_id));
 
+            if(transaction.amount < 0) {
+                amountView.setText(String.format(Locale.getDefault(), "%.1f$", transaction.amount).toString());
+                amountView.setTextColor(getContext().getResources().getColor(com.google.android.material.R.color.design_default_color_error));
+            } else {
+                amountView.setText(String.format(Locale.getDefault(), "%.1f$", transaction.amount));
+            }
+            categoryView.setText(getCategoryName(transaction.category_id));
             // Format the date (you'll need to add a timestamp field to your TransactionTable)
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            dateView.setText("Date: " + dateFormat.format(new Date()));
+            dateView.setText("Date: " + dateFormat.format(transaction.date) + " at:" + transaction.date.getHours() + ":" + transaction.date.getMinutes());
         }
 
         return convertView;
