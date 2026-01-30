@@ -15,7 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.hourdex.expensetracker.controllers.BudgetController;
+import com.hourdex.expensetracker.database.tables.BudgetTable;
+
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ListFragment extends Fragment {
 
@@ -26,6 +30,7 @@ public class ListFragment extends Fragment {
     private String mParam2;
     private TransactionAdapter adapter;
     private ListView listView;
+    private ProgressBar progressBar;
 
     public ListFragment() {
         // Required empty public constructor
@@ -44,7 +49,6 @@ public class ListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            percentTage = Integer.parseInt(getArguments().getString(ARG_PARAM1));
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -54,7 +58,7 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
-        ProgressBar progressBar = view.findViewById(R.id.progressBar);
+        progressBar = view.findViewById(R.id.progressBar);
         progressBar.setProgress(percentTage);
 
         listView = view.findViewById(R.id.transaction_list);
@@ -89,6 +93,18 @@ public class ListFragment extends Fragment {
                             ", amount:" + t.amount + ", category_id:" + t.category_id);
                 });
             });
+
+            new Thread(()->{
+                BudgetTable lastTable = mainActivity.getBudgetDao().getLastBudget();
+                Log.d("testDB", "lastTable: " + lastTable.current_amount + ", " + lastTable.last_init_amount);
+
+                percentTage = (int) (  lastTable.current_amount/lastTable.last_init_amount * 100) ;
+                Log.d("testDB", "percentTage: " + percentTage);
+                progressBar.setProgress(percentTage,true);
+            }).start();
+
+
+
         }
     }
 }

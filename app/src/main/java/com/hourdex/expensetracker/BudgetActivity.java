@@ -23,6 +23,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.hourdex.expensetracker.controllers.BudgetController;
 import com.hourdex.expensetracker.database.ExpenseRoom;
 import com.hourdex.expensetracker.database.daos.BudgetDao;
 import com.hourdex.expensetracker.database.tables.BudgetTable;
@@ -44,7 +45,7 @@ public class BudgetActivity extends AppCompatActivity {
     private ActivityBudgetBinding binding;
 
     private ExpenseRoom room;
-    private BudgetDao budgetDao;
+    private BudgetController budgetController;
 
 
 
@@ -55,7 +56,8 @@ public class BudgetActivity extends AppCompatActivity {
         room = Room.databaseBuilder(getApplicationContext(), ExpenseRoom.class, "expense_db")
                 .build();
 
-        budgetDao = room.budgetDao();
+        BudgetDao _budgetDao = room.budgetDao();
+        budgetController = new BudgetController(_budgetDao);
 
         super.onCreate(savedInstanceState);
 
@@ -84,7 +86,7 @@ public class BudgetActivity extends AppCompatActivity {
                 } else {
                     float amount = Float.parseFloat(textInputEditText.getText().toString());
                     new Thread(()->{
-                        budgetDao.newRecord(
+                        budgetController.setBudget(
                                 new BudgetTable(
                                         amount,
                                         amount
@@ -104,12 +106,12 @@ public class BudgetActivity extends AppCompatActivity {
     }
 
     private void setBudget() {
-        new Thread(()->{
-            BudgetTable lastBudget = budgetDao.getLastBudget();
-            if (lastBudget != null) {
-                runOnUiThread(() -> binding.availabeAmount.setText("Available: " + lastBudget.current_amount + "$"));
-            }
-        }).start();
+            new Thread(()->{
+                BudgetTable budgetTable = budgetController.getLastBudget();
+                runOnUiThread(() -> {
+                    binding.availabeAmount.setText(String.format("%.2f", budgetTable.current_amount));
+                });
+            }).start();
     }
 
     private void setGraph() {
@@ -128,14 +130,13 @@ public class BudgetActivity extends AppCompatActivity {
         xAxis.setGranularity(1f);
 
         YAxis leftAxis = chart.getAxisLeft();
-        leftAxis.setAxisMinimum(0f);
         leftAxis.setDrawAxisLine(false);
         leftAxis.setDrawGridLines(true);
         leftAxis.setGridColor(Color.LTGRAY);
         leftAxis.setLabelCount(6, false);
 
         new Thread(() -> {
-            List<BudgetTable> budgets = budgetDao.getAll(); // blocking call assumed
+            List<BudgetTable> budgets = budgetController.getAllBudget();
 
             if (budgets.isEmpty()) {
                 runOnUiThread(() -> {
@@ -157,7 +158,7 @@ public class BudgetActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 LineDataSet dataSet = new LineDataSet(entries, "Budget");
                 dataSet.setColor(ContextCompat.getColor(this, com.google.android.material.R.color.design_default_color_primary));
-                dataSet.setLineWidth(3.5f);          // ← reduced from 20f
+                dataSet.setLineWidth(5f);
                 dataSet.setCircleRadius(4.5f);
                 dataSet.setDrawCircleHole(false);
                 dataSet.setDrawValues(false);

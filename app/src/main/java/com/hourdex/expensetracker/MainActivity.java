@@ -21,7 +21,6 @@ import com.hourdex.expensetracker.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ExpenseRoom room;
     private TransactionDao transactionDao;
     private BudgetDao budgetDao;
 
@@ -33,11 +32,10 @@ public class MainActivity extends AppCompatActivity {
         return budgetDao;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        room = Room.databaseBuilder(getApplicationContext(), ExpenseRoom.class, "expense_db")
+        ExpenseRoom room = Room.databaseBuilder(getApplicationContext(), ExpenseRoom.class, "expense_db")
                 .build();
 
         transactionDao = room.transactionDao();
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             FragmentTransaction fragmentTransaction = fragmentManager
                     .beginTransaction()
                     .setCustomAnimations(
-                            R.anim.slide_in_right,    // enter
+                            R.anim.slide_in_right,     // enter
                             R.anim.slide_out_right,    // exit
                             R.anim.slide_in_right,     // popEnter
                             R.anim.slide_out_right     // popBack
