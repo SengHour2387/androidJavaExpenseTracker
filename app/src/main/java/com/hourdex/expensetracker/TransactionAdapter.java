@@ -49,7 +49,10 @@ public class TransactionAdapter extends ArrayAdapter<TransactionTable> {
             }
 
             new Thread(()->{
-                categoryView.setText(getCategoryName(transaction.category_id));
+                String catName = getCategoryName(transaction.category_id);
+                ((MainActivity) getContext()).runOnUiThread(() -> {
+                    categoryView.setText(catName);
+                });
             }).start();
             // Format the date (you'll need to add a timestamp field to your TransactionTable)
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());

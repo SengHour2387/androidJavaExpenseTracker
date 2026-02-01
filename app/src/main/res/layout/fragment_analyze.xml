@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text=" Budget Analysis"
+            android:text=" Budget History"
             android:textStyle="bold"
             android:layout_margin="8dp"
             android:textSize="24sp" />
@@ -30,10 +30,39 @@
             android:layout_marginBottom="8dp"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:text="Categories Analysis"
+            android:text="Transactions on Categoris"
             />
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="Income on Categories"
+            />
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart2"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="Outcome on Categories"
+            />
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/pieChart3"
             android:layout_width="match_parent"
             android:layout_height="300dp"/>
     </LinearLayout>

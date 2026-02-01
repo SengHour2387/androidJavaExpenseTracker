@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.text.Highlights;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,8 +26,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.hourdex.expensetracker.controllers.BudgetController;
-import com.hourdex.expensetracker.database.ExpenseRoom;
 import com.hourdex.expensetracker.database.tables.BudgetTable;
 import com.hourdex.expensetracker.database.tables.CategoryTable;
 
@@ -54,7 +55,10 @@ public class AnalyzeFragment extends Fragment {
     private MainActivity mainActivity;
 
     private LineChart lineChart;
-    private PieChart pieChart;
+    private PieChart pieChartOnCountPerCat;
+    private PieChart pieChartOnIncomePerCat;
+    private PieChart pieChartOnOutcomePerCat;
+
 
     public AnalyzeFragment() {
         // Required empty public constructor
@@ -99,10 +103,18 @@ public class AnalyzeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_analyze, container, false);
 
         lineChart = view.findViewById(R.id.lineChart);
-        pieChart = view.findViewById(R.id.pieChart);
+        pieChartOnCountPerCat = view.findViewById(R.id.pieChart);
+        pieChartOnIncomePerCat = view.findViewById(R.id.pieChart2);
+        pieChartOnOutcomePerCat = view.findViewById(R.id.pieChart3);
+
         setGraph();
-        setupPieChart();
-        loadPieChartData();
+        setupPieChart(pieChartOnCountPerCat , "Transactions/\nCategory");
+        setupPieChart(pieChartOnIncomePerCat, "Income/\nCategory");
+        setupPieChart(pieChartOnOutcomePerCat, "Outcome/\nCategory");
+        loadPieChartDataOnCountPerCat();
+        loadPieChartDataOnIncomePerCat();
+        loadPieChartDataOnOutcomePerCat();
+
         return view;
     }
 
@@ -132,6 +144,7 @@ public class AnalyzeFragment extends Fragment {
 
             if (budgets.isEmpty()) {
                 mainActivity.runOnUiThread(() -> {
+                    if (!isAdded()) return;
                     chart.setData(null);
                     chart.invalidate();
                 });
@@ -148,6 +161,7 @@ public class AnalyzeFragment extends Fragment {
             }
 
             mainActivity.runOnUiThread(() -> {
+                if (!isAdded()) return;
                 LineDataSet dataSet = new LineDataSet(entries, "Budget");
                 dataSet.setColor(ContextCompat.getColor(mainActivity, com.google.android.material.R.color.design_default_color_primary));
                 dataSet.setLineWidth(5f);
@@ -167,33 +181,30 @@ public class AnalyzeFragment extends Fragment {
             });
         }).start();
     }
-
-    private void setupPieChart() {
-        pieChart.setUsePercentValues(true);
+    private void setupPieChart( PieChart pieChart , String holdText ) {
+        pieChart.setUsePercentValues(false);
         pieChart.getDescription().setEnabled(false);
-        pieChart.setExtraOffsets(5f, 10f, 5f, 5f);
+        pieChart.setExtraOffsets(0f, 20f, 30f, 5f);
 
-        // Hole in center (donut style)
+
         pieChart.setDrawHoleEnabled(true);
         pieChart.setHoleColor(Color.WHITE);
-        pieChart.setTransparentCircleColor(Color.WHITE);
-        pieChart.setTransparentCircleAlpha(110);
+        pieChart.setTransparentCircleColor(Color.BLACK);
+        pieChart.setTransparentCircleAlpha(255);
         pieChart.setHoleRadius(58f);
-        pieChart.setTransparentCircleRadius(61f);
+        pieChart.setTransparentCircleRadius(90f);
 
-        // Center text (optional)
         pieChart.setDrawCenterText(true);
-        pieChart.setCenterText("Transaction\nCategories");
+        pieChart.setCenterText(holdText);
         pieChart.setCenterTextSize(16f);
         pieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD);
         pieChart.setCenterTextColor(Color.DKGRAY);
 
-        // Interaction
         pieChart.setRotationAngle(0f);
         pieChart.setRotationEnabled(true);
         pieChart.setHighlightPerTapEnabled(true);
 
-        // Legend
+
         Legend l = pieChart.getLegend();
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
@@ -203,17 +214,15 @@ public class AnalyzeFragment extends Fragment {
         l.setYEntrySpace(0f);
         l.setYOffset(10f);
 
-        // Entry labels (shown on slices)
         pieChart.setEntryLabelColor(Color.WHITE);
         pieChart.setEntryLabelTextSize(12f);
 
-        // Animation when data loads
         pieChart.animateY(1400, Easing.EaseInOutQuad);
     }
 
-    private void loadPieChartData() {
-        ArrayList<PieEntry> entries = new ArrayList<>();
+    private void loadPieChartDataOnCountPerCat() {
         new Thread(()->{
+            ArrayList<PieEntry> entries = new ArrayList<>();
             List<CategoryTable> allCategory = mainActivity.getCategoryDao().getAll();
 
             allCategory.forEach( categoryTable -> {
@@ -222,36 +231,136 @@ public class AnalyzeFragment extends Fragment {
                     entries.add(new PieEntry(count, categoryTable.name));
                 }
             } );
+
+            mainActivity.runOnUiThread(() -> {
+                if (!isAdded()) return;
+                PieDataSet dataSet = new PieDataSet(entries, "Categories");
+
+                dataSet.setSliceSpace(3f);
+                dataSet.setSelectionShift(8f);
+                dataSet.setDrawIcons(false);
+
+                // few colors
+                ArrayList<Integer> colors = new ArrayList<>();
+                colors.add(Color.parseColor("#4CAF50"));
+                colors.add(Color.parseColor("#2196F3"));
+                colors.add(Color.parseColor("#FF9800"));
+                colors.add(Color.parseColor("#9E9E9E"));
+                colors.add(Color.parseColor("#3F51B5"));
+                colors.add(Color.parseColor("#F44336"));
+                colors.add(Color.parseColor("#3F51B5"));
+                colors.add(Color.parseColor("#F44336"));
+                colors.add(Color.parseColor("#FF5722"));
+                colors.add(Color.parseColor("#607D8B"));
+                dataSet.setColors(colors);
+
+                PieData pieData = new PieData(dataSet);
+                pieData.setValueFormatter(new PercentFormatter(pieChartOnCountPerCat));
+                pieData.setValueTextSize(14f);
+                pieData.setValueTextColor(Color.BLUE);
+                pieData.setValueTypeface(Typeface.DEFAULT_BOLD);
+
+                pieChartOnCountPerCat.setData(pieData);
+                pieChartOnCountPerCat.highlightValues(null);
+                dataSet.setYValuePosition( PieDataSet.ValuePosition.OUTSIDE_SLICE );
+                pieChartOnCountPerCat.invalidate();
+            });
         }).start();
+    }
 
-        PieDataSet dataSet = new PieDataSet(entries, "Categories");
+    private void loadPieChartDataOnOutcomePerCat() {
+        new Thread(()->{
+            ArrayList<PieEntry> pieEntries = new ArrayList<>();
+            List<CategoryTable> allCategory = mainActivity.getCategoryDao().getAll();
 
-        dataSet.setSliceSpace(3f);          // Space between slices
-        dataSet.setSelectionShift(8f);      // Pop-out effect on tap
-        dataSet.setDrawIcons(false);
+            allCategory.forEach( categoryTable -> {
+                Double amount = mainActivity.getTransactionDao().getTransactionOutcomeByCategory(categoryTable.id );
 
-        // Custom colors
-        ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(Color.parseColor("#4CAF50"));
-        colors.add(Color.parseColor("#2196F3"));
-        colors.add(Color.parseColor("#FF9800"));
-        colors.add(Color.parseColor("#9E9E9E"));
-        colors.add(Color.parseColor("#3F51B5"));
-        colors.add(Color.parseColor("#F44336"));
-        colors.add(Color.parseColor("#3F51B5"));
-        colors.add(Color.parseColor("#F44336"));
-        colors.add(Color.parseColor("#FF5722"));
-        colors.add(Color.parseColor("#607D8B"));
-        dataSet.setColors(colors);
+                if (amount != null) {
+                    pieEntries.add( new PieEntry(amount.floatValue() * -1,categoryTable.name) );
+                }
+            } );
 
-        PieData pieData = new PieData(dataSet);
-        pieData.setValueFormatter(new PercentFormatter(pieChart));
-        pieData.setValueTextSize(14f);
-        pieData.setValueTextColor(Color.WHITE);
-        pieData.setValueTypeface(Typeface.DEFAULT_BOLD);
+            mainActivity.runOnUiThread(() -> {
+                if (!isAdded()) return;
+                PieDataSet dataSet = new PieDataSet(pieEntries, "Categories");
 
-        pieChart.setData(pieData);
-        pieChart.highlightValues(null);     // Clear any pre-selection
-        pieChart.invalidate();              // Refresh chart
+                dataSet.setSliceSpace(3f);
+                dataSet.setSelectionShift(8f);
+                dataSet.setDrawIcons(false);
+
+                // few colors
+                ArrayList<Integer> colors = new ArrayList<>();
+                colors.add(Color.parseColor("#4CAF50"));
+                colors.add(Color.parseColor("#2196F3"));
+                colors.add(Color.parseColor("#FF9800"));
+                colors.add(Color.parseColor("#9E9E9E"));
+                colors.add(Color.parseColor("#3F51B5"));
+                colors.add(Color.parseColor("#F44336"));
+                colors.add(Color.parseColor("#3F51B5"));
+                colors.add(Color.parseColor("#F44336"));
+                colors.add(Color.parseColor("#FF5722"));
+                colors.add(Color.parseColor("#607D8B"));
+                dataSet.setColors(colors);
+
+                PieData pieData = new PieData(dataSet);
+                pieData.setValueFormatter(new PercentFormatter(pieChartOnOutcomePerCat));
+                pieData.setValueTextSize(14f);
+                pieData.setValueTextColor(Color.RED);
+                pieData.setValueTypeface(Typeface.DEFAULT_BOLD);
+
+                pieChartOnOutcomePerCat.setData(pieData);
+                pieChartOnOutcomePerCat.highlightValues(null);
+                dataSet.setYValuePosition( PieDataSet.ValuePosition.OUTSIDE_SLICE );
+                pieChartOnOutcomePerCat.invalidate();
+            });
+        }).start();
+    }
+    private void loadPieChartDataOnIncomePerCat() {
+        new Thread(()->{
+            ArrayList<PieEntry> pieEntries = new ArrayList<>();
+            List<CategoryTable> allCategory = mainActivity.getCategoryDao().getAll();
+
+            allCategory.forEach( categoryTable -> {
+                Double amount = mainActivity.getTransactionDao().getTransactionIncomeByCategory(categoryTable.id );
+
+                if (amount != null) {
+                    pieEntries.add( new PieEntry(amount.floatValue(),categoryTable.name) );
+                }
+            } );
+
+            mainActivity.runOnUiThread(() -> {
+                if (!isAdded()) return;
+                PieDataSet dataSet = new PieDataSet(pieEntries, "Categories");
+
+                dataSet.setSliceSpace(10f);
+                dataSet.setSelectionShift(8f);
+                dataSet.setDrawIcons(false);
+
+                // few colors
+                ArrayList<Integer> colors = new ArrayList<>();
+                colors.add(Color.parseColor("#4CAF50"));
+                colors.add(Color.parseColor("#2196F3"));
+                colors.add(Color.parseColor("#FF9800"));
+                colors.add(Color.parseColor("#9E9E9E"));
+                colors.add(Color.parseColor("#3F51B5"));
+                colors.add(Color.parseColor("#F44336"));
+                colors.add(Color.parseColor("#3F51B5"));
+                colors.add(Color.parseColor("#F44336"));
+                colors.add(Color.parseColor("#FF5722"));
+                colors.add(Color.parseColor("#607D8B"));
+                dataSet.setColors(colors);
+
+                PieData pieData = new PieData(dataSet);
+                pieData.setValueFormatter(new PercentFormatter(pieChartOnIncomePerCat));
+                pieData.setValueTextSize(14f);
+                pieData.setValueTextColor(Color.GREEN);
+                pieData.setValueTypeface(Typeface.DEFAULT_BOLD);
+
+                pieChartOnIncomePerCat.setData(pieData);
+                dataSet.setYValuePosition( PieDataSet.ValuePosition.OUTSIDE_SLICE );
+                pieChartOnIncomePerCat.invalidate();
+            });
+        }).start();
     }
 }

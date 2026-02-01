@@ -27,4 +27,12 @@ public interface TransactionDao {
     @Query("SELECT COUNT(*) FROM transaction_tbl WHERE category_id = :categoryId ")
     int getTransactionCountByCategory( int categoryId );
 
+    @Query("SELECT SUM(amount) FROM transaction_tbl WHERE category_id = :categoryId AND amount > 0 ")
+    Double getTransactionIncomeByCategory(int categoryId );
+
+    @Query("SELECT SUM(amount) FROM transaction_tbl WHERE category_id = :categoryId AND amount < 0 ")
+    Double getTransactionOutcomeByCategory(int categoryId );
+
+
+
 }

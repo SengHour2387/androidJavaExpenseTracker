@@ -35,6 +35,7 @@ public class ListFragment extends Fragment {
 
     private TextView amountView;
     private BudgetTable lastTable;
+    private TextView budgetUpdate;
 
     private MainActivity mainActivity;
 
@@ -67,6 +68,7 @@ public class ListFragment extends Fragment {
         mainActivity = (MainActivity) getActivity();
 
         progressBar = view.findViewById(R.id.progressBar);
+        budgetUpdate = view.findViewById(R.id.budget_change);
         progressBar.setProgress(percentTage);
         amountView = view.findViewById(R.id.amount_compare);
 
@@ -120,6 +122,16 @@ public class ListFragment extends Fragment {
                 if (isAdded() && getActivity() != null) {
                     getActivity().runOnUiThread(() -> {
                         progressBar.setProgress(percentTage, true);
+
+                        double updateAmount =  lastTable.current_amount - lastTable.last_init_amount;
+
+                        if(updateAmount<0) {
+                            budgetUpdate.setTextColor(0xFFBB0000);
+                            budgetUpdate.setText(String.format("%.1f$", updateAmount));
+                        } else {
+                            budgetUpdate.setTextColor(0xFF00BB00);
+                            budgetUpdate.setText(String.format( "+%.1f$", updateAmount));
+                        }
                         amountView.setText(String.format("%.1f$/%.1f$", lastTable.current_amount, lastTable.last_init_amount));
                     });
                 }
