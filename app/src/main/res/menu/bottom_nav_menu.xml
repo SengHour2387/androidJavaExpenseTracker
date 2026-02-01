@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/all_list"
+        android:title="All List"
+        android:icon="@drawable/list_icon">
+    </item>
+    <item
+        android:id="@+id/analyze"
+        android:title="Analyze"
+        android:icon="@drawable/line_icon">
+    </item>
+</menu>

@@ -10,7 +10,7 @@
         app:cardCornerRadius="24dp"
         app:cardElevation="0dp"
         android:layout_margin="15dp"
-        app:cardBackgroundColor="#E8EDF5">
+        app:cardBackgroundColor="#220000FF">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,17 +24,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Label"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#5A6B7D"
-                android:layout_marginBottom="8dp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <!-- Amount and Category Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="4dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/transaction_amount_label"
@@ -42,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:text="Amount: "
                     android:textSize="15sp"
-                    android:textColor="#5A6B7D" />
+                    />
 
                 <TextView
                     android:id="@+id/transaction_amount"
@@ -58,9 +55,9 @@
                     android:id="@+id/transaction_category"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textStyle="bold"
                     android:text="Food"
-                    android:textSize="15sp"
-                    android:textColor="#5A6B7D" />
+                    android:textSize="15sp" />
             </LinearLayout>
 
             <!-- Date -->
@@ -69,8 +66,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Date: dd/mm/yyyy"
-                android:textSize="13sp"
-                android:textColor="#B8C4D0" />
+                android:textSize="11sp"
+                android:textColor="#888888" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </FrameLayout>

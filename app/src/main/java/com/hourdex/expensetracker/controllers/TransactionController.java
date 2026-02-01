@@ -6,15 +6,14 @@ import com.hourdex.expensetracker.MainActivity;
 import com.hourdex.expensetracker.database.tables.BudgetTable;
 import com.hourdex.expensetracker.database.tables.TransactionTable;
 
+import java.util.Collections;
 import java.util.Date;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TransactionController {
 
     private final MainActivity mainActivity;
-    private final Executor executor = Executors.newSingleThreadExecutor();
 
     public TransactionController(MainActivity mainActivity) {
         this.mainActivity = mainActivity;
@@ -22,50 +21,51 @@ public class TransactionController {
 
     public boolean createTransaction(TransactionTable transaction) {
 
-        AtomicBoolean isSaved = new AtomicBoolean(true);
+        BudgetTable budget =
+                mainActivity.getBudgetDao().getLastBudget();
 
-        executor.execute(() -> {
+        // Expense but no budget → reject
+        if (transaction.amount < 0 && budget == null) {
+            Log.d("testDB", "No budget, expense rejected");
+            return false;
+        }
 
-            BudgetTable budget =
-                    mainActivity.getBudgetDao().getLastBudget();
+        // Income and no budget → create budget
+        if (transaction.amount > 0 && budget == null) {
+            budget = new BudgetTable(
+                    transaction.amount,
+                    transaction.amount
+            );
+            mainActivity.getBudgetDao().newRecord(budget);
+        }
 
-            // Expense but no budget → reject
-            if (transaction.amount < 0 && budget == null) {
-                Log.d("testDB", "No budget, expense rejected");
-                isSaved.set(false);
-                return;
-            }
-
-            // Income and no budget → create budget
-            if (transaction.amount > 0 && budget == null) {
-                budget = new BudgetTable(
+        // Insert transaction
+        mainActivity.getTransactionDao().newTransaction(
+                new TransactionTable(
+                        transaction.label,
                         transaction.amount,
-                        transaction.amount
-                );
-                mainActivity.getBudgetDao().newRecord(budget);
-            }
+                        transaction.category_id,
+                        transaction.description,
+                        new Date()
+                )
+        );
 
-            // Insert transaction
-            mainActivity.getTransactionDao().newTransaction(
-                    new TransactionTable(
-                            transaction.label,
-                            transaction.amount,
-                            transaction.category_id,
-                            transaction.description,
-                            new Date()
+        // Update budget
+        if (budget != null) {
+            mainActivity.getBudgetDao().newRecord(
+                    new BudgetTable(
+                            budget.current_amount + transaction.amount,
+                            budget.last_init_amount
                     )
             );
+        }
+        return true;
+    }
 
-            // Update budget
-            if (budget != null) {
-                mainActivity.getBudgetDao().newRecord(
-                        new BudgetTable(
-                                budget.current_amount + transaction.amount,
-                                budget.last_init_amount
-                        )
-                );
-            }
-        });
-        return isSaved.get();
+    public List<TransactionTable> getTop5() {
+        List<TransactionTable> top5 = Collections.emptyList();
+
+
+        return top5;
     }
 }

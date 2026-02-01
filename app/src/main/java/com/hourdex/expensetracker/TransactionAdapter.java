@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hourdex.expensetracker.database.daos.CategoryDao;
+import com.hourdex.expensetracker.database.tables.CategoryTable;
 import com.hourdex.expensetracker.database.tables.TransactionTable;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +47,10 @@ public class TransactionAdapter extends ArrayAdapter<TransactionTable> {
             } else {
                 amountView.setText(String.format(Locale.getDefault(), "%.1f$", transaction.amount));
             }
-            categoryView.setText(getCategoryName(transaction.category_id));
+
+            new Thread(()->{
+                categoryView.setText(getCategoryName(transaction.category_id));
+            }).start();
             // Format the date (you'll need to add a timestamp field to your TransactionTable)
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
             dateView.setText("Date: " + dateFormat.format(transaction.date) + " at:" + transaction.date.getHours() + ":" + transaction.date.getMinutes());
@@ -55,13 +60,11 @@ public class TransactionAdapter extends ArrayAdapter<TransactionTable> {
     }
 
     private String getCategoryName(int categoryId) {
-        switch (categoryId) {
-            case 1: return "Food";
-            case 2: return "Work";
-            case 3: return "Study";
-            case 4: return "House";
-            case 5: return "Transport";
-            default: return "Other";
-        }
+        if (categoryId <= 0) return "Uncategorized";
+
+        CategoryDao dao = ((MainActivity) getContext()).getCategoryDao();
+
+        CategoryTable cat = dao.getCategory(categoryId);
+        return (cat != null) ? cat.name : "Unknown";
     }
 }

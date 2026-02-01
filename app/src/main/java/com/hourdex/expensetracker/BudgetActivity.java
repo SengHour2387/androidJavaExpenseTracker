@@ -109,7 +109,9 @@ public class BudgetActivity extends AppCompatActivity {
             new Thread(()->{
                 BudgetTable budgetTable = budgetController.getLastBudget();
                 runOnUiThread(() -> {
-                    binding.availabeAmount.setText(String.format("%.2f", budgetTable.current_amount));
+                    if (budgetTable != null) {
+                        binding.availabeAmount.setText( "Available:"+ String.format("%.2f", budgetTable.current_amount) + "$");
+                    }
                 });
             }).start();
     }

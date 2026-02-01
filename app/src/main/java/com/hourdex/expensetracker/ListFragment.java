@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.hourdex.expensetracker.controllers.BudgetController;
 import com.hourdex.expensetracker.database.tables.BudgetTable;
@@ -31,6 +32,11 @@ public class ListFragment extends Fragment {
     private TransactionAdapter adapter;
     private ListView listView;
     private ProgressBar progressBar;
+
+    private TextView amountView;
+    private BudgetTable lastTable;
+
+    private MainActivity mainActivity;
 
     public ListFragment() {
         // Required empty public constructor
@@ -58,8 +64,11 @@ public class ListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_list, container, false);
 
+        mainActivity = (MainActivity) getActivity();
+
         progressBar = view.findViewById(R.id.progressBar);
         progressBar.setProgress(percentTage);
+        amountView = view.findViewById(R.id.amount_compare);
 
         listView = view.findViewById(R.id.transaction_list);
         adapter = new TransactionAdapter(getContext(), new ArrayList<>());
@@ -70,18 +79,14 @@ public class ListFragment extends Fragment {
             intent.setClass(getContext(), BudgetActivity.class);
             startActivity(intent);
         });
-
-
         listView.setAdapter(adapter);
         return view;
     }
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        MainActivity mainActivity = (MainActivity) getActivity();
-
         if (mainActivity != null) {
             mainActivity.getTransactionDao().getAll().observe(getViewLifecycleOwner(), transactionTables -> {
                 adapter.clear();
@@ -94,17 +99,31 @@ public class ListFragment extends Fragment {
                 });
             });
 
-            new Thread(()->{
-                BudgetTable lastTable = mainActivity.getBudgetDao().getLastBudget();
-                Log.d("testDB", "lastTable: " + lastTable.current_amount + ", " + lastTable.last_init_amount);
+            setProgressBarView();
+        }
+    }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() != null) {
+            setProgressBarView();
+        }
+    }
+
+    private void setProgressBarView() {
+        new Thread(()->{
+            lastTable = mainActivity.getBudgetDao().getLastBudget();
+            if (lastTable != null) {
                 percentTage = (int) (  lastTable.current_amount/lastTable.last_init_amount * 100) ;
                 Log.d("testDB", "percentTage: " + percentTage);
-                progressBar.setProgress(percentTage,true);
-            }).start();
-
-
-
-        }
+                if (isAdded() && getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        progressBar.setProgress(percentTage, true);
+                        amountView.setText(String.format("%.1f$/%.1f$", lastTable.current_amount, lastTable.last_init_amount));
+                    });
+                }
+            }
+        }).start();
     }
 }

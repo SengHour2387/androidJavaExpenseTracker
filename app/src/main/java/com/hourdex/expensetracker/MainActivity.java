@@ -13,9 +13,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.room.Room;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.hourdex.expensetracker.database.ExpenseRoom;
 import com.hourdex.expensetracker.database.daos.BudgetDao;
+import com.hourdex.expensetracker.database.daos.CategoryDao;
 import com.hourdex.expensetracker.database.daos.TransactionDao;
 import com.hourdex.expensetracker.databinding.ActivityMainBinding;
 
@@ -23,11 +25,16 @@ public class MainActivity extends AppCompatActivity {
 
     private TransactionDao transactionDao;
     private BudgetDao budgetDao;
-
+    private CategoryDao categoryDao;
 
     public TransactionDao getTransactionDao() {
         return transactionDao;
     }
+
+    public CategoryDao getCategoryDao() {
+        return categoryDao;
+    }
+
     public BudgetDao getBudgetDao() {
         return budgetDao;
     }
@@ -40,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         transactionDao = room.transactionDao();
         budgetDao = room.budgetDao();
+        categoryDao = room.categoryDao();
 
         super.onCreate(savedInstanceState);
 
@@ -64,13 +72,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final FloatingActionButton addFab = binding.floatingActionButton;
+        final BottomNavigationView bottomNavigationView = binding.bottomNavigationView;
+
 
         fragmentManager.addOnBackStackChangedListener( () ->{
             Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainerView);
             if (currentFragment instanceof InsertFragment) {
-                binding.floatingActionButton.setVisibility(View.GONE);  // Hide when in InsertFragment
+                binding.floatingActionButton.setVisibility(View.GONE);
+                bottomNavigationView.setVisibility(View.GONE);
             } else {
-                binding.floatingActionButton.setVisibility(View.VISIBLE);  // Show otherwise
+                binding.floatingActionButton.setVisibility(View.VISIBLE);
+                bottomNavigationView.setVisibility(View.VISIBLE);
             }
         } );
 
@@ -78,14 +90,45 @@ public class MainActivity extends AppCompatActivity {
             FragmentTransaction fragmentTransaction = fragmentManager
                     .beginTransaction()
                     .setCustomAnimations(
-                            R.anim.slide_in_right,     // enter
-                            R.anim.slide_out_right,    // exit
-                            R.anim.slide_in_right,     // popEnter
-                            R.anim.slide_out_right     // popBack
-                    );
+                            R.anim.slide_in_bottom,     // enter
+                            R.anim.slide_out_bottom,    // exit
+                            R.anim.slide_in_bottom,     // popEnter
+                            R.anim.slide_out_bottom     // popBack
+                            );
             fragmentTransaction.replace(R.id.fragmentContainerView, new InsertFragment());
             fragmentTransaction.addToBackStack("add_fragment");
             fragmentTransaction.commit();
         });
+
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+
+            if(id != bottomNavigationView.getSelectedItemId()) {
+                if(id == R.id.all_list) {
+                    setCurrentTab(ListFragment.newInstance(35,null),
+                            fragmentManager.beginTransaction().setCustomAnimations(
+                                    R.anim.slide_in_right,     // enter
+                                    R.anim.slide_out_left    // exit
+                            )
+                    );
+                } else if (id == R.id.analyze) {
+                    setCurrentTab( new AnalyzeFragment() ,
+                            fragmentManager.beginTransaction().setCustomAnimations(
+                                    R.anim.slide_in_left,     // enter
+                                    R.anim.slide_out_right    // exit
+                            )
+                    );
+                }
+            }
+            return true;
+        });
+
+
+    }
+
+    private void setCurrentTab( Fragment fragment, FragmentTransaction fragmentTransaction) {
+        fragmentTransaction
+                .replace(R.id.fragmentContainerView, fragment)
+                .commit();
     }
 }

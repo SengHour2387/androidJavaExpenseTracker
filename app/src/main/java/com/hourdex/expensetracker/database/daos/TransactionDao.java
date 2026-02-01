@@ -24,4 +24,7 @@ public interface TransactionDao {
     @Query("SELECT * FROM transaction_tbl WHERE amount < 0")
     LiveData<List<TransactionTable>> getOutcome();
 
+    @Query("SELECT COUNT(*) FROM transaction_tbl WHERE category_id = :categoryId ")
+    int getTransactionCountByCategory( int categoryId );
+
 }
