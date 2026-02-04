@@ -20,6 +20,10 @@ import com.hourdex.expensetracker.database.daos.BudgetDao;
 import com.hourdex.expensetracker.database.daos.CategoryDao;
 import com.hourdex.expensetracker.database.daos.TransactionDao;
 import com.hourdex.expensetracker.databinding.ActivityMainBinding;
+import com.hourdex.expensetracker.screens.AnalyzeFragment;
+import com.hourdex.expensetracker.screens.InsertFragment;
+import com.hourdex.expensetracker.screens.ListFragment;
+import com.hourdex.expensetracker.screens.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -74,15 +78,14 @@ public class MainActivity extends AppCompatActivity {
         final FloatingActionButton addFab = binding.floatingActionButton;
         final BottomNavigationView bottomNavigationView = binding.bottomNavigationView;
 
-
         fragmentManager.addOnBackStackChangedListener( () ->{
             Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragmentContainerView);
             if (currentFragment instanceof InsertFragment) {
                 binding.floatingActionButton.setVisibility(View.GONE);
-                bottomNavigationView.setVisibility(View.GONE);
+                bottomNavigationView.animate().translationY(300f);
             } else {
                 binding.floatingActionButton.setVisibility(View.VISIBLE);
-                bottomNavigationView.setVisibility(View.VISIBLE);
+                bottomNavigationView.animate().translationY(0f);
             }
         } );
 
@@ -101,10 +104,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
+
+            int currentFragmentId = bottomNavigationView.getSelectedItemId();
+
             int id = item.getItemId();
 
             if(id != bottomNavigationView.getSelectedItemId()) {
-                if(id == R.id.all_list) {
+                if(id == R.id.all_list) {;
+                    binding.floatingActionButton.animate().translationX( 0f );
                     setCurrentTab(ListFragment.newInstance(35,null),
                             fragmentManager.beginTransaction().setCustomAnimations(
                                     R.anim.slide_in_right,     // enter
@@ -112,7 +119,23 @@ public class MainActivity extends AppCompatActivity {
                             )
                     );
                 } else if (id == R.id.analyze) {
-                    setCurrentTab( new AnalyzeFragment() ,
+                    binding.floatingActionButton.animate().translationX( 300f );
+                    if(currentFragmentId == R.id.all_list) {
+                        setCurrentTab( new AnalyzeFragment(),
+                                fragmentManager.beginTransaction().setCustomAnimations(
+                                        R.anim.slide_in_left,     // enter
+                                        R.anim.slide_out_right    // exit
+                                ));
+                    } else {setCurrentTab( new AnalyzeFragment(),
+                                fragmentManager.beginTransaction().setCustomAnimations(
+                                        R.anim.slide_in_right,     // enter
+                                        R.anim.slide_out_left    // exit
+                                ));
+                    }
+
+                } else if (id == R.id.settings) {
+                    binding.floatingActionButton.animate().translationX( 300f );
+                    setCurrentTab( new SettingsFragment() ,
                             fragmentManager.beginTransaction().setCustomAnimations(
                                     R.anim.slide_in_left,     // enter
                                     R.anim.slide_out_right    // exit

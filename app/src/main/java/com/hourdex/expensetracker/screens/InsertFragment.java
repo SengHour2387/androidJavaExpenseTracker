@@ -1,4 +1,4 @@
-package com.hourdex.expensetracker;
+package com.hourdex.expensetracker.screens;
 
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
@@ -17,10 +17,14 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.hourdex.expensetracker.MainActivity;
+import com.hourdex.expensetracker.R;
 import com.hourdex.expensetracker.controllers.TransactionController;
-import com.hourdex.expensetracker.database.daos.CategoryDao;
 import com.hourdex.expensetracker.database.tables.CategoryTable;
 import com.hourdex.expensetracker.database.tables.TransactionTable;
+
+import androidx.activity.OnBackPressedCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,13 +42,14 @@ public class InsertFragment extends Fragment {
     private String selectedCategory = null;
     private ArrayAdapter<String> categoryAdapter;
     private List<String> categoryNames = new ArrayList<>();
-    private List<CategoryTable> allCategories = new ArrayList<>();  // ← added (small & useful)
+    private List<CategoryTable> allCategories = new ArrayList<>(); // ← added (small & useful)
 
-    public InsertFragment() {}
+    public InsertFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_insert, container, false);
 
@@ -61,9 +66,7 @@ public class InsertFragment extends Fragment {
 
         Button saveBtn = view.findViewById(R.id.save_btn);
 
-        typeSwitch.setOnCheckedChangeListener((b, checked) ->
-                typeText.setText(checked ? "Income" : "Outcome")
-        );
+        typeSwitch.setOnCheckedChangeListener((b, checked) -> typeText.setText(checked ? "Income" : "Outcome"));
 
         btnAAddCgr.setOnClickListener(addCategoryListener());
 
@@ -75,20 +78,34 @@ public class InsertFragment extends Fragment {
                 selectedCategory = parent.getItemAtPosition(position).toString();
             }
 
-            @Override public void onNothingSelected(AdapterView<?> adapterView) {}
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+            }
         });
 
-        // Initial setup
+
         categoryNames.add("Select category");
         categoryAdapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
-                categoryNames
-        );
+                categoryNames);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(categoryAdapter);
 
-        getCategories();  // load once on start
+        getCategories();
+
+        requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(),
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+                        if (hasAnyInput()) {
+                            showBackConfirmationDialog();
+                        } else {
+                            setEnabled(false);
+                            requireActivity().getOnBackPressedDispatcher().onBackPressed();
+                        }
+                    }
+                });
 
         return view;
     }
@@ -112,11 +129,9 @@ public class InsertFragment extends Fragment {
                     CategoryTable category = new CategoryTable(name);
                     long newId = mainActivity.getCategoryDao().insertCategory(category);
 
-                    // Reload categories (this also updates allCategories)
                     getCategories();
 
                     requireActivity().runOnUiThread(() -> {
-                        // Try to auto-select the newly added category
                         int position = categoryNames.indexOf(name);
                         if (position >= 0) {
                             spinner.setSelection(position);
@@ -134,7 +149,8 @@ public class InsertFragment extends Fragment {
     }
 
     private void getCategories() {
-        if (mainActivity == null) return;
+        if (mainActivity == null)
+            return;
 
         new Thread(() -> {
             List<CategoryTable> categories = mainActivity.getCategoryDao().getAll();
@@ -151,7 +167,6 @@ public class InsertFragment extends Fragment {
 
             requireActivity().runOnUiThread(() -> {
                 categoryAdapter.notifyDataSetChanged();
-                // Optional: keep "Select category" selected after refresh
                 spinner.setSelection(0);
             });
         }).start();
@@ -182,8 +197,7 @@ public class InsertFragment extends Fragment {
         }
 
         String title = titleInput.getText().toString().trim();
-        String description = descriptionInput.getText() != null ?
-                descriptionInput.getText().toString().trim() : "";
+        String description = descriptionInput.getText() != null ? descriptionInput.getText().toString().trim() : "";
 
         int categoryId = getCategoryId(selectedCategory);
 
@@ -193,7 +207,8 @@ public class InsertFragment extends Fragment {
         }
 
         MainActivity activity = (MainActivity) getActivity();
-        if (activity == null) return;
+        if (activity == null)
+            return;
 
         new Thread(() -> {
             TransactionController controller = new TransactionController(activity);
@@ -203,8 +218,7 @@ public class InsertFragment extends Fragment {
                     typeSwitch.isChecked() ? amount : -amount,
                     categoryId,
                     description,
-                    new Date()
-            );
+                    new Date());
 
             boolean isSaved = controller.createTransaction(transaction);
 
@@ -230,5 +244,44 @@ public class InsertFragment extends Fragment {
             }
         }
         return 0;
+    }
+
+    private boolean hasAnyInput() {
+        return (amountInput.getText() != null && !amountInput.getText().toString().trim().isEmpty()) ||
+                (titleInput.getText() != null && !titleInput.getText().toString().trim().isEmpty()) ||
+                (descriptionInput.getText() != null && !descriptionInput.getText().toString().trim().isEmpty()) ||
+                (selectedCategory != null && !selectedCategory.equals("Select category"));
+    }
+
+    private boolean isDataValid() {
+        if (titleInput.getText() == null || titleInput.getText().toString().trim().isEmpty())
+            return false;
+        if (amountInput.getText() == null || amountInput.getText().toString().trim().isEmpty())
+            return false;
+        if (selectedCategory == null || selectedCategory.equals("Select category"))
+            return false;
+
+        try {
+            Double.parseDouble(amountInput.getText().toString().trim());
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private void showBackConfirmationDialog() {
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Please confirm")
+                .setMessage("You have unsaved changes. What would you like to do?")
+                .setNeutralButton("Cancel", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("Clear", (dialog, which) -> {
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                });
+
+        if (isDataValid()) {
+            builder.setPositiveButton("Save", (dialog, which) -> saveTransaction());
+        }
+
+        builder.show();
     }
 }

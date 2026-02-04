@@ -42,11 +42,9 @@ public class TransactionAdapter extends ArrayAdapter<TransactionTable> {
             titleView.setText(transaction.label);
 
             if(transaction.amount < 0) {
-                amountView.setText(String.format(Locale.getDefault(), "%.1f$", transaction.amount).toString());
                 amountView.setTextColor(getContext().getResources().getColor(com.google.android.material.R.color.design_default_color_error));
-            } else {
-                amountView.setText(String.format(Locale.getDefault(), "%.1f$", transaction.amount));
             }
+            amountView.setText(String.format(Locale.getDefault(), "%.1f$", transaction.amount));
 
             new Thread(()->{
                 String catName = getCategoryName(transaction.category_id);

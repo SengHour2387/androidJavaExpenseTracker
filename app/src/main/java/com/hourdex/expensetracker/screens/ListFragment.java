@@ -1,4 +1,4 @@
-package com.hourdex.expensetracker;
+package com.hourdex.expensetracker.screens;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,11 +16,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.hourdex.expensetracker.controllers.BudgetController;
+import com.hourdex.expensetracker.MainActivity;
+import com.hourdex.expensetracker.R;
+import com.hourdex.expensetracker.TransactionAdapter;
 import com.hourdex.expensetracker.database.tables.BudgetTable;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class ListFragment extends Fragment {
 

@@ -23,7 +23,7 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragmentContainerView"
-                android:name="com.hourdex.expensetracker.ListFragment"
+                android:name="com.hourdex.expensetracker.screens.ListFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </FrameLayout>

@@ -7,6 +7,7 @@ import androidx.room.Query;
 import com.hourdex.expensetracker.database.tables.CategoryTable;
 
 import java.util.List;
+
 @Dao
 public interface CategoryDao {
 
@@ -14,7 +15,10 @@ public interface CategoryDao {
     List<CategoryTable> getAll();
 
     @Query("SELECT * from category_tbl WHERE id = :id LIMIT 1")
-    CategoryTable getCategory( int id );
+    CategoryTable getCategory(int id);
+
+    @Query("UPDATE category_tbl SET name = :name WHERE id = :id")
+    void updateCategory(int id, String name);
 
     @Insert
     Long insertCategory(CategoryTable category);

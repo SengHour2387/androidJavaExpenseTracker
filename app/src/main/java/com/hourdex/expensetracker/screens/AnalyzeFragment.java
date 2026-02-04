@@ -1,4 +1,4 @@
-package com.hourdex.expensetracker;
+package com.hourdex.expensetracker.screens;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import android.text.Highlights;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +25,9 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.hourdex.expensetracker.MainActivity;
+import com.hourdex.expensetracker.R;
 import com.hourdex.expensetracker.controllers.BudgetController;
 import com.hourdex.expensetracker.database.tables.BudgetTable;
 import com.hourdex.expensetracker.database.tables.CategoryTable;
@@ -191,14 +192,14 @@ public class AnalyzeFragment extends Fragment {
         pieChart.setHoleColor(Color.WHITE);
         pieChart.setTransparentCircleColor(Color.BLACK);
         pieChart.setTransparentCircleAlpha(255);
-        pieChart.setHoleRadius(58f);
-        pieChart.setTransparentCircleRadius(90f);
+        pieChart.setHoleRadius(50f);
+        pieChart.setTransparentCircleRadius(85f);
 
         pieChart.setDrawCenterText(true);
         pieChart.setCenterText(holdText);
         pieChart.setCenterTextSize(16f);
         pieChart.setCenterTextTypeface(Typeface.DEFAULT_BOLD);
-        pieChart.setCenterTextColor(Color.DKGRAY);
+        pieChart.setCenterTextColor(Color.BLACK);
 
         pieChart.setRotationAngle(0f);
         pieChart.setRotationEnabled(true);
@@ -236,7 +237,7 @@ public class AnalyzeFragment extends Fragment {
                 if (!isAdded()) return;
                 PieDataSet dataSet = new PieDataSet(entries, "Categories");
 
-                dataSet.setSliceSpace(3f);
+                dataSet.setSliceSpace(5f);
                 dataSet.setSelectionShift(8f);
                 dataSet.setDrawIcons(false);
 
@@ -263,6 +264,17 @@ public class AnalyzeFragment extends Fragment {
                 pieChartOnCountPerCat.setData(pieData);
                 pieChartOnCountPerCat.highlightValues(null);
                 dataSet.setYValuePosition( PieDataSet.ValuePosition.OUTSIDE_SLICE );
+                dataSet.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+
+                        if(value == 1) {
+                            return "A tran";
+                        } else  {
+                            return String.format("%.0f trans", value);
+                        }
+                    }
+                });
                 pieChartOnCountPerCat.invalidate();
             });
         }).start();
@@ -285,7 +297,7 @@ public class AnalyzeFragment extends Fragment {
                 if (!isAdded()) return;
                 PieDataSet dataSet = new PieDataSet(pieEntries, "Categories");
 
-                dataSet.setSliceSpace(3f);
+                dataSet.setSliceSpace(5f);
                 dataSet.setSelectionShift(8f);
                 dataSet.setDrawIcons(false);
 
@@ -307,6 +319,12 @@ public class AnalyzeFragment extends Fragment {
                 pieData.setValueFormatter(new PercentFormatter(pieChartOnOutcomePerCat));
                 pieData.setValueTextSize(14f);
                 pieData.setValueTextColor(Color.RED);
+                pieData.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        return String.format("-%.2f$",value);
+                    }
+                });
                 pieData.setValueTypeface(Typeface.DEFAULT_BOLD);
 
                 pieChartOnOutcomePerCat.setData(pieData);
@@ -333,7 +351,7 @@ public class AnalyzeFragment extends Fragment {
                 if (!isAdded()) return;
                 PieDataSet dataSet = new PieDataSet(pieEntries, "Categories");
 
-                dataSet.setSliceSpace(10f);
+                dataSet.setSliceSpace(5f);
                 dataSet.setSelectionShift(8f);
                 dataSet.setDrawIcons(false);
 
@@ -354,7 +372,13 @@ public class AnalyzeFragment extends Fragment {
                 PieData pieData = new PieData(dataSet);
                 pieData.setValueFormatter(new PercentFormatter(pieChartOnIncomePerCat));
                 pieData.setValueTextSize(14f);
-                pieData.setValueTextColor(Color.GREEN);
+                pieData.setValueTextColor(0xff00BB00);
+                pieData.setValueFormatter(new ValueFormatter() {
+                    @Override
+                    public String getFormattedValue(float value) {
+                        return String.format("+%.2f$",value);
+                    }
+                });
                 pieData.setValueTypeface(Typeface.DEFAULT_BOLD);
 
                 pieChartOnIncomePerCat.setData(pieData);

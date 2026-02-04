@@ -1,4 +1,4 @@
-package com.hourdex.expensetracker;
+package com.hourdex.expensetracker.screens;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,6 +23,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.hourdex.expensetracker.R;
 import com.hourdex.expensetracker.controllers.BudgetController;
 import com.hourdex.expensetracker.database.ExpenseRoom;
 import com.hourdex.expensetracker.database.daos.BudgetDao;
@@ -31,9 +32,6 @@ import com.hourdex.expensetracker.databinding.ActivityBudgetBinding;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 public class BudgetActivity extends AppCompatActivity {
 

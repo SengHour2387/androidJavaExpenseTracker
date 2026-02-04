@@ -10,4 +10,9 @@
         android:title="Analyze"
         android:icon="@drawable/line_icon">
     </item>
+    <item
+        android:id="@+id/settings"
+        android:title="Settings"
+        android:icon="@drawable/settings_icons">
+    </item>
 </menu>
