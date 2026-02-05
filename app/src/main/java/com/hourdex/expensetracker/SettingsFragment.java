@@ -70,7 +70,7 @@ public class SettingsFragment extends Fragment {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
         bottomSheetDialog.setContentView(R.layout.add_category_btm_modal);
 
-        TextView title = bottomSheetDialog.findViewById(R.id.textView2);
+        TextView title = bottomSheetDialog.findViewById(R.id.cat_btm_sheet_title);
         if (title != null)
             title.setText("Edit Category");
 
