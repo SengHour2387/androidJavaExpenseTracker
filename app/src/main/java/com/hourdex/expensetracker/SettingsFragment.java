@@ -68,7 +68,7 @@ public class SettingsFragment extends Fragment {
 
     private void showEditCategoryDialog(CategoryTable category) {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(requireContext());
-        bottomSheetDialog.setContentView(R.layout.add_category_btm_modal); // Reuse the same layout
+        bottomSheetDialog.setContentView(R.layout.add_category_btm_modal);
 
         TextView title = bottomSheetDialog.findViewById(R.id.textView2);
         if (title != null)
