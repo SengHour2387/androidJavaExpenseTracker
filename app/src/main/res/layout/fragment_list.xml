@@ -55,6 +55,14 @@
                 android:textStyle="bold"
                 android:text="0$"
                 />
+            <ImageView
+                android:id="@+id/trend_icon"
+                android:layout_margin="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/trend_up"
+                />
 
             <TextView
                 android:id="@+id/amount_compare"

@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     public TransactionDao getTransactionDao() {
         return transactionDao;
     }
-
     public CategoryDao getCategoryDao() {
         return categoryDao;
     }
@@ -45,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         ExpenseRoom room = Room.databaseBuilder(getApplicationContext(), ExpenseRoom.class, "expense_db")
                 .build();
 
@@ -110,12 +108,12 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
 
             if(id != bottomNavigationView.getSelectedItemId()) {
-                if(id == R.id.all_list) {;
+                if(id == R.id.all_list) {
                     binding.floatingActionButton.animate().translationX( 0f );
                     setCurrentTab(ListFragment.newInstance(35,null),
                             fragmentManager.beginTransaction().setCustomAnimations(
-                                    R.anim.slide_in_right,     // enter
-                                    R.anim.slide_out_left    // exit
+                                    R.anim.slide_in_right,    // enter
+                                    R.anim.slide_out_left     // exit
                             )
                     );
                 } else if (id == R.id.analyze) {
@@ -126,7 +124,8 @@ public class MainActivity extends AppCompatActivity {
                                         R.anim.slide_in_left,     // enter
                                         R.anim.slide_out_right    // exit
                                 ));
-                    } else {setCurrentTab( new AnalyzeFragment(),
+                    } else {
+                        setCurrentTab( new AnalyzeFragment(),
                                 fragmentManager.beginTransaction().setCustomAnimations(
                                         R.anim.slide_in_right,     // enter
                                         R.anim.slide_out_left    // exit

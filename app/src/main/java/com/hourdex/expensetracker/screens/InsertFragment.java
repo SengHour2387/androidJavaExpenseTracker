@@ -36,7 +36,7 @@ public class InsertFragment extends Fragment {
     private MaterialSwitch typeSwitch;
     private TextView typeText;
     private Spinner spinner;
-    private ImageButton btnAAddCgr;
+    private Button btnAAddCgr;
 
     private MainActivity mainActivity;
     private String selectedCategory = null;
@@ -82,7 +82,6 @@ public class InsertFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> adapterView) {
             }
         });
-
 
         categoryNames.add("Select category");
         categoryAdapter = new ArrayAdapter<>(
@@ -143,7 +142,6 @@ public class InsertFragment extends Fragment {
 
                 bottomSheetDialog.dismiss();
             });
-
             bottomSheetDialog.show();
         };
     }
@@ -281,7 +279,6 @@ public class InsertFragment extends Fragment {
         if (isDataValid()) {
             builder.setPositiveButton("Save", (dialog, which) -> saveTransaction());
         }
-
         builder.show();
     }
 }

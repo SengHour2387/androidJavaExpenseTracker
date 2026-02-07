@@ -21,8 +21,7 @@ public class TransactionController {
 
     public boolean createTransaction(TransactionTable transaction) {
 
-        BudgetTable budget =
-                mainActivity.getBudgetDao().getLastBudget();
+        BudgetTable budget = mainActivity.getBudgetDao().getLastBudget();
 
         // Expense but no budget → reject
         if (transaction.amount < 0 && budget == null) {

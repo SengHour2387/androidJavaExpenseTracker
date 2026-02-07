@@ -18,7 +18,6 @@ public class TransactionTable {
 
     @ColumnInfo(name = "amount")
     public double amount;
-
     @ColumnInfo(name = "category_id")
     public int category_id;
 

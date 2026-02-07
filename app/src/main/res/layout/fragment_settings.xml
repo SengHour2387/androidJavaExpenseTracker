@@ -18,7 +18,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="Settings"
-                android:textColor="#4A5568"
                 android:textSize="20sp"
                 android:textStyle="bold" />
         </com.google.android.material.appbar.MaterialToolbar>
@@ -34,7 +33,6 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="Categories"
-                android:textColor="#4A5568"
                 android:textSize="16sp"
                 android:layout_gravity="center"
                 android:textStyle="bold" />
@@ -44,8 +42,7 @@
                 style="@style/Widget.Material3.Button.IconButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:icon="@drawable/style_bulk_4"
-                app:iconTint="#4A5568" />
+                app:icon="@drawable/style_bulk_4" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

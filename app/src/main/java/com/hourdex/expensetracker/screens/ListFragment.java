@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -37,12 +38,11 @@ public class ListFragment extends Fragment {
     private TextView amountView;
     private BudgetTable lastTable;
     private TextView budgetUpdate;
+    private ImageView budgetIcon;
 
     private MainActivity mainActivity;
 
-    public ListFragment() {
-        // Required empty public constructor
-    }
+    public ListFragment() {}
 
     public static ListFragment newInstance(int pTag, String param2) {
         ListFragment fragment = new ListFragment();
@@ -72,6 +72,7 @@ public class ListFragment extends Fragment {
         budgetUpdate = view.findViewById(R.id.budget_change);
         progressBar.setProgress(percentTage);
         amountView = view.findViewById(R.id.amount_compare);
+        budgetIcon = view.findViewById(R.id.trend_icon);
 
         listView = view.findViewById(R.id.transaction_list);
         adapter = new TransactionAdapter(getContext(), new ArrayList<>());
@@ -95,13 +96,7 @@ public class ListFragment extends Fragment {
                 adapter.clear();
                 adapter.addAll(transactionTables);
                 adapter.notifyDataSetChanged();
-
-                transactionTables.forEach(t -> {
-                    Log.d("testDB", "Transaction: id:" + t.id + ", label:" + t.label +
-                            ", amount:" + t.amount + ", category_id:" + t.category_id);
-                });
             });
-
             setProgressBarView();
         }
     }
@@ -129,9 +124,15 @@ public class ListFragment extends Fragment {
                         if(updateAmount<0) {
                             budgetUpdate.setTextColor(0xFFBB0000);
                             budgetUpdate.setText(String.format("%.1f$", updateAmount));
+                            budgetIcon.setImageResource(R.drawable.trend_down);
+                            budgetIcon.setScaleX(2f);
+                            budgetIcon.setScaleY(2f);
                         } else {
                             budgetUpdate.setTextColor(0xFF00BB00);
                             budgetUpdate.setText(String.format( "+%.1f$", updateAmount));
+                            budgetIcon.setImageResource(R.drawable.trend_up);
+                            budgetIcon.setScaleX(2f);
+                            budgetIcon.setScaleY(2f);
                         }
                         amountView.setText(String.format("%.1f$/%.1f$", lastTable.current_amount, lastTable.last_init_amount));
                     });

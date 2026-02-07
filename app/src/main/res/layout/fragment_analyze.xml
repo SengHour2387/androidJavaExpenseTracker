@@ -30,7 +30,7 @@
             android:layout_marginBottom="8dp"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:text="Transactions on Categoris"
+            android:text="Transactions on Categories"
             />
         <com.github.mikephil.charting.charts.PieChart
             android:id="@+id/pieChart"

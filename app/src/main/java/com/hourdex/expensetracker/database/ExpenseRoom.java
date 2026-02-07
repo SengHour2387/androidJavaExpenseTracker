@@ -17,6 +17,5 @@ import com.hourdex.expensetracker.database.tables.TransactionTable;
 public abstract class ExpenseRoom extends RoomDatabase {
     public abstract TransactionDao transactionDao();
     public abstract BudgetDao budgetDao();
-
     public abstract CategoryDao categoryDao();
 }

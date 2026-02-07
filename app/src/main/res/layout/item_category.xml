@@ -27,7 +27,6 @@
                 android:layout_weight="1"
                 android:text="Category Name"
                 android:textSize="16sp"
-                android:textColor="#2D3748"
                 android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
@@ -36,7 +35,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/edit_cate_icon"
-                app:iconTint="#4A5568" />
+                />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

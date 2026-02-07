@@ -15,7 +15,7 @@ public interface TransactionDao {
     @Insert
     void newTransaction( TransactionTable transactionTable );
 
-    @Query("SELECT * FROM transaction_tbl")
+    @Query("SELECT * FROM transaction_tbl ORDER BY date DESC")
     LiveData<List<TransactionTable>> getAll();
 
     @Query("SELECT * FROM transaction_tbl WHERE amount > 0")
